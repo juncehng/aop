@@ -135,7 +135,8 @@ public class SysLogAspect {
         return ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
     }
 
-//    private void setGridUserInfo(SysLog sysLog){
+
+    //    private void setGridUserInfo(SysLog sysLog){
 //        HttpServletRequest request = getRequest();
 //        HttpSession session = request.getSession();
 //
