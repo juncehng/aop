@@ -1,8 +1,11 @@
 package com.liu.aop.cfg.circleDependces;
 
 import com.liu.aop.aspect.annotation.SysOperaLog;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
 
 /**
  * 循环依赖测试
@@ -10,7 +13,7 @@ import org.springframework.stereotype.Service;
  * @date: 2021/3/9 10:47
  */
 @Service
-public class CircleA {
+public class CircleA implements InitializingBean {
 
     @Autowired
     private CircleB circleb;
@@ -20,7 +23,17 @@ public class CircleA {
 
     }
 
+    @PostConstruct
+    public void PostConstructMethod(){
+        System.out.println("CircleA PostConstructMethod...");
+    }
+
     public CircleA() {
-        System.out.println("CircleA");
+        System.out.println("CircleA construct...");
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        System.out.println("CircleA afterPropertiesSet...");
     }
 }
