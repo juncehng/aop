@@ -1,10 +1,12 @@
 package com.liu.aop.controller;
 
 import com.liu.aop.aspect.annotation.SysOperaLog;
+import com.liu.aop.cfg.circleDependces.CircleA;
 import com.liu.aop.entity.ResultObject;
 import com.liu.aop.entity.request.BodyValidateRequest;
 import com.liu.aop.entity.request.RequestBodyValidateRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,6 +23,9 @@ import javax.validation.constraints.NotEmpty;
 @Slf4j
 @RestController
 public class AopTestController {
+
+    @Autowired
+    private CircleA circleA;
 
     @GetMapping("testAop")
     @SysOperaLog(desc = "【AOP注解测试接口】",level = 2)
@@ -42,5 +47,13 @@ public class AopTestController {
     @PostMapping("testValidate2")
     public String testValidate2(@Validated @RequestBody RequestBodyValidateRequest requestBodyValidateRequest){
         return requestBodyValidateRequest.toString();
+    }
+
+    /**
+     * 测试代理对象执行方法
+     */
+    @GetMapping("test")
+    public void test(){
+        circleA.testMethodA();
     }
 }

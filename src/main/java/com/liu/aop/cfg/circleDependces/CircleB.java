@@ -30,4 +30,8 @@ public class CircleB implements InitializingBean {
     public void afterPropertiesSet() throws Exception {
         System.out.println("CircleB afterPropertiesSet...");
     }
+
+    public String testMethod(){
+        return "CircleB testMethod......";
+    }
 }
