@@ -22,8 +22,7 @@ import javax.annotation.PostConstruct;
  * sharedInstance = getSingleton(beanName, () -> {
  * 	try {
  * 		return createBean(beanName, mbd, args);
- *        }
- * 	catch (BeansException ex) {
+ *  }catch (BeansException ex) {
  * 		// Explicitly remove instance from singleton cache: It might have been put there
  * 		// eagerly by the creation process, to allow for circular reference resolution.
  * 		// Also remove any beans that received a temporary reference to the bean.
