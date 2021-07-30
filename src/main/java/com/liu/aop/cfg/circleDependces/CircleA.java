@@ -32,6 +32,7 @@ import javax.annotation.PostConstruct;
  * });
  *
  * 第二个：这个Lambada是在doCreateBean这个方法里面的，将当前被创建的Bean添加到第三级缓存中（此时Bean实例已经被创建，但是还未populate）
+ * 所有的bean单实例创建都会添加到三级缓存中，但是执行三级缓存需要触发条件，只要达到了触发条件才会执行，否则就算添加进去了也不会执行
  * 这个接口被触发的条件是：这个对象存在者循环依赖，且这个对象是一个需要被AOP代理增强的对象
  * addSingletonFactory(beanName, () -> getEarlyBeanReference(beanName, mbd, bean));
  *
