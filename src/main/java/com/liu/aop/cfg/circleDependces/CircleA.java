@@ -33,16 +33,20 @@ import javax.annotation.PostConstruct;
  *
  * 第二个：这个Lambada是在doCreateBean这个方法里面的，将当前被创建的Bean添加到第三级缓存中（此时Bean实例已经被创建，但是还未populate）
  * 所有的bean单实例创建都会添加到三级缓存中，但是执行三级缓存需要触发条件，只要达到了触发条件才会执行，否则就算添加进去了也不会执行
- * 这个接口被触发的条件是：这个对象存在者循环依赖，且这个对象是一个需要被AOP代理增强的对象
+ * 这个接口被触发的条件是：这个对象存在循环依赖。
+ * 解决循环依赖的关键：从三级缓存中获取bean，并放到二级缓存中，最后再从二级缓存中获取初始换完成的Bean，并放到一级缓存中
  * addSingletonFactory(beanName, () -> getEarlyBeanReference(beanName, mbd, bean));
  *
  * protected Object getEarlyBeanReference(String beanName, RootBeanDefinition mbd, Object bean) {
+ *     // 将当前正在创建的Bean赋值给exposedObject
+ *     // 若不需要被AOP增强，则直接返回
+ *     // 若需要被AOP增强，
  *     Object exposedObject = bean;
  *     if (!mbd.isSynthetic() && hasInstantiationAwareBeanPostProcessors()) {
  *         for (BeanPostProcessor bp : getBeanPostProcessors()) {
  *             if (bp instanceof SmartInstantiationAwareBeanPostProcessor) {
  *                 SmartInstantiationAwareBeanPostProcessor ibp = (SmartInstantiationAwareBeanPostProcessor) bp;
- *                 // 调用后置处理器，创建代理对象
+ *                 // 如果此时对象需要被AOP增强，则创建并返回代理对象
  *                 exposedObject = ibp.getEarlyBeanReference(exposedObject, beanName);
  *             }
  *         }
@@ -63,10 +67,11 @@ import javax.annotation.PostConstruct;
  *             if (singletonObject == null && allowEarlyReference) {
  *                 // 获取第三级缓存中保存的ObjectFactory（上面的第二个Lambada表达式）
  *                 ObjectFactory<?> singletonFactory = this.singletonFactories.get(beanName);
- *                 // 第二三级缓存被触发的条件是：这个对象存在者循环依赖，且这个对象是一个需要被AOP代理增强的对象
+ *                 // 第二三级缓存被触发的条件是：这个对象存在循环依赖
  *                 if (singletonFactory != null) {
- *                     // 尝试使用第三级缓存中缓存的【ObjectFactory】，通过调用后置处理器创建代理对象
- *                     // 将创建完成的代理对象放到二级缓存中
+ *                     // 尝试使用第三级缓存中缓存的【ObjectFactory】，获取Bean
+ *                     // 1、若当前对象不需要被AOP增强，则直接返回当前正在创建的对象
+ *                     // 2、若当前对象需要被增强，则通过调用后置处理器创建代理对象，并将代理对象赋值给正在创建的Bean并返回
  *                     singletonObject = singletonFactory.getObject();
  *                     this.earlySingletonObjects.put(beanName, singletonObject);
  *                     this.singletonFactories.remove(beanName);
